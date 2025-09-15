@@ -14,7 +14,7 @@ export default {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem", // Reduced for mobile-first
+        DEFAULT: "1rem",
         sm: "1.5rem",
         lg: "2rem",
       },
