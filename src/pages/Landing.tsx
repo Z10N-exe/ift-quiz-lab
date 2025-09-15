@@ -1,21 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Users, Trophy, Clock, Sun, Moon } from "lucide-react";
 
 const Landing = () => {
-  const [isDark, setIsDark] = useState(() => {
-    // Check localStorage or system preference
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) return savedTheme === "dark";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
-
-  useEffect(() => {
-    // Persist theme in localStorage
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark]);
+  const [isDark, setIsDark] = useState(false);
 
   const toggleDarkMode = () => {
     setIsDark(!isDark);
@@ -43,7 +33,7 @@ const Landing = () => {
   ];
 
   return (
-    <div className={`min-h-screen bg-gradient-academic font-sans transition-all duration-300 ${isDark ? "dark" : ""}`}>
+    <div className={`min-h-screen bg-gradient-academic font-sans ${isDark ? "dark" : ""}`}>
       {/* Header */}
       <header className="border-b bg-card/90 backdrop-blur-sm sticky top-0 z-10">
         <div className="container px-4 py-4 sm:px-6 sm:py-5">
@@ -65,7 +55,7 @@ const Landing = () => {
                 onClick={toggleDarkMode}
                 aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
                 aria-checked={isDark}
-                className="hover:bg-accent/50 hover:animate-button-pulse transition-all duration-300"
+                className="hover:bg-accent/50 transition-all duration-300"
               >
                 {isDark ? (
                   <Sun className="h-5 w-5 text-primary" />
@@ -80,7 +70,7 @@ const Landing = () => {
 
       {/* Main Content */}
       <main className="container px-4 py-8 sm:px-6 sm:py-10">
-        <div className="text-center mb-8 sm:mb-10 animate-fade-in">
+        <div className="text-center mb-8 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
             Choose Your Course
           </h2>
@@ -155,7 +145,7 @@ const Landing = () => {
         </div>
 
         {/* Features */}
-        <div className="mt-10 sm:mt-12 text-center animate-fade-in">
+        <div className="mt-10 sm:mt-12 text-center">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               {
