@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Clock, ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, CheckCircle, Sun, Moon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -38,11 +38,14 @@ const Quiz = () => {
   const [loading, setLoading] = useState(true);
   const [startTime] = useState(Date.now());
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme ? savedTheme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
 
-  const courseNames = {
-    "IFT212.2": "Computer Architecture",
-    "IFT235.2": "Mobile App Performance",
-  };
+  useEffect(() => {
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   useEffect(() => {
     if (courseId) {
@@ -54,7 +57,6 @@ const Quiz = () => {
     const timer = setInterval(() => {
       setTimeElapsed(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [startTime]);
 
@@ -180,7 +182,7 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-academic">
+      <div className={`min-h-screen flex items-center justify-center bg-gradient-academic transition-all duration-300 ${isDark ? "dark" : ""}`}>
         <Card className="w-full max-w-md border-border animate-accordion-down">
           <CardContent className="flex items-center justify-center p-6 sm:p-8">
             <div className="text-center space-y-4">
@@ -195,7 +197,7 @@ const Quiz = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-academic">
+      <div className={`min-h-screen flex items-center justify-center bg-gradient-academic transition-all duration-300 ${isDark ? "dark" : ""}`}>
         <Card className="w-full max-w-md border-border animate-accordion-down">
           <CardContent className="text-center p-6 sm:p-8">
             <p className="text-muted-foreground text-sm">
@@ -203,7 +205,7 @@ const Quiz = () => {
             </p>
             <Button
               onClick={() => navigate("/")}
-              className="mt-4 bg-gradient-primary text-primary-foreground hover:bg-primary/90"
+              className="mt-4 bg-gradient-primary text-primary-foreground hover:bg-primary/90 hover:animate-button-pulse"
             >
               Back to Home
             </Button>
@@ -218,7 +220,7 @@ const Quiz = () => {
   const currentAnswer = answers.find((a) => a.questionId === currentQuestion.id);
 
   return (
-    <div className="min-h-screen bg-gradient-academic">
+    <div className={`min-h-screen bg-gradient-academic transition-all duration-300 ${isDark ? "dark" : ""}`}>
       {/* Header */}
       <header className="border-b bg-card/90 backdrop-blur-sm sticky top-0 z-10">
         <div className="container px-4 py-4 sm:px-6 sm:py-5">
@@ -246,7 +248,9 @@ const Quiz = () => {
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span className="font-mono">{formatTime(timeElapsed)}</span>
+                <span className="font-mono" aria-live="polite">
+                  {formatTime(timeElapsed)}
+                </span>
               </div>
               <Badge
                 variant="secondary"
@@ -254,6 +258,20 @@ const Quiz = () => {
               >
                 {currentQuestion.topic}
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsDark(!isDark)}
+                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                aria-checked={isDark}
+                className="hover:bg-accent/50 hover:animate-button-pulse transition-all duration-300"
+              >
+                {isDark ? (
+                  <Sun className="h-5 w-5 text-primary" />
+                ) : (
+                  <Moon className="h-5 w-5 text-primary" />
+                )}
+              </Button>
             </div>
           </div>
 
@@ -267,7 +285,7 @@ const Quiz = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-6 sm:px-6 sm:py-8">
+      <main className="container px-4 py-6 sm:px-6 sm:py-8 animate-fade-in">
         <Card
           className="w-full max-w-full sm:max-w-3xl mx-auto border-border shadow-quiz animate-accordion-down"
           role="region"
@@ -332,7 +350,7 @@ const Quiz = () => {
                 variant="outline"
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className="w-full sm:w-auto border-border hover:bg-accent/50"
+                className="w-full sm:w-auto border-border hover:bg-accent/50 hover:animate-button-pulse"
                 aria-label="Previous question"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
