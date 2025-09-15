@@ -1,9 +1,26 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Trophy, Clock } from "lucide-react";
+import { BookOpen, Users, Trophy, Clock, Sun, Moon } from "lucide-react";
 
 const Landing = () => {
+  const [isDark, setIsDark] = useState(() => {
+    // Check localStorage or system preference
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) return savedTheme === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    // Persist theme in localStorage
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
+
+  const toggleDarkMode = () => {
+    setIsDark(!isDark);
+  };
+
   const courses = [
     {
       id: "IFT212.2",
@@ -26,28 +43,44 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-academic font-sans">
+    <div className={`min-h-screen bg-gradient-academic font-sans transition-all duration-300 ${isDark ? "dark" : ""}`}>
       {/* Header */}
       <header className="border-b bg-card/90 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-5">
+        <div className="container px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                CBT Quiz Lab
+                CBT MOCK PLATFORM FOR IFT
               </h1>
               <p className="text-sm text-muted-foreground mt-1">Computer-Based Testing Platform</p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Academic Excellence</span>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>Academic Excellence</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleDarkMode}
+                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+                aria-checked={isDark}
+                className="hover:bg-accent/50 hover:animate-button-pulse transition-all duration-300"
+              >
+                {isDark ? (
+                  <Sun className="h-5 w-5 text-primary" />
+                ) : (
+                  <Moon className="h-5 w-5 text-primary" />
+                )}
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 sm:px-6 sm:py-10">
-        <div className="text-center mb-8 sm:mb-10">
+      <main className="container px-4 py-8 sm:px-6 sm:py-10">
+        <div className="text-center mb-8 sm:mb-10 animate-fade-in">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
             Choose Your Course
           </h2>
@@ -58,12 +91,13 @@ const Landing = () => {
 
         {/* Course Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {courses.map((course) => (
+          {courses.map((course, index) => (
             <Card
               key={course.id}
-              className="group hover:shadow-quiz transition-all duration-300 border-border hover:border-primary/50 focus-within:ring-2 focus-within:ring-ring"
+              className="group hover:shadow-quiz transition-all duration-300 border-border hover:border-primary/50 focus-within:ring-2 focus-within:ring-ring animate-accordion-down"
               role="article"
               aria-labelledby={`course-title-${course.id}`}
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className="pb-3">
                 <div className={`h-1 w-full bg-${course.color} rounded-full mb-3`} />
@@ -106,7 +140,7 @@ const Landing = () => {
 
                   <Link to={`/quiz/${course.id}`}>
                     <Button
-                      className="w-full sm:w-auto bg-gradient-primary text-primary-foreground hover:bg-primary/90 group-hover:shadow-academic transition-all duration-300"
+                      className="w-full sm:w-auto bg-gradient-primary text-primary-foreground hover:bg-primary/90 hover:animate-button-pulse group-hover:shadow-academic transition-all duration-300"
                       size="lg"
                       aria-label={`Start ${course.title} test`}
                     >
@@ -121,7 +155,7 @@ const Landing = () => {
         </div>
 
         {/* Features */}
-        <div className="mt-10 sm:mt-12 text-center">
+        <div className="mt-10 sm:mt-12 text-center animate-fade-in">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               {
@@ -145,9 +179,10 @@ const Landing = () => {
             ].map((feature, index) => (
               <div
                 key={index}
-                className={`space-y-3 p-4 rounded-lg ${feature.bg} hover:bg-accent/50 transition-all duration-300`}
+                className={`space-y-3 p-4 rounded-md ${feature.bg} hover:bg-accent/50 transition-all duration-300 animate-accordion-down`}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 bg-primary/10 rounded-sm flex items-center justify-center mx-auto">
                   {feature.icon}
                 </div>
                 <h3 className="font-semibold text-foreground">{feature.title}</h3>
@@ -160,7 +195,7 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-10 sm:mt-12">
-        <div className="container mx-auto px-4 py-6 sm:px-6 text-center">
+        <div className="container px-4 py-6 sm:px-6 text-center">
           <p className="text-sm text-muted-foreground">
             Built by <span className="font-semibold text-primary">Z10N</span>
           </p>
